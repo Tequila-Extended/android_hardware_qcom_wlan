@@ -3877,19 +3877,16 @@ static int pack_nlmsg_twt_params(struct nl_msg *twt_nl_msg, char *cmd,
 
 char *result_copy_to_buf(char *src, char *dst_buf, int *dst_len)
 {
-	size_t str_len, remaining = 0;
-
-	if (!dst_buf || *dst_len < 0)
-		return NULL;
+	int str_len, remaining = 0;
 
 	remaining = *dst_len;
 	str_len = strlen(src);
+	remaining = remaining - (str_len + 1);
 
-	if (remaining > 0 && (remaining - 1) > str_len)
-		remaining = remaining - (str_len + 1);
-	else
+	if (remaining <= 0) {
+		wpa_printf(MSG_ERROR, "destination buffer length not enough");
 		return NULL;
-
+	}
 	os_memcpy(dst_buf, src, str_len);
 
 	*dst_len = remaining;
